@@ -84,7 +84,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         private void Update() {
             if (AudioSource.clip == null) return;
 
-            var index = (int)(AudioSource.Position() * circularAudioClip.SegCount);
+            var index = (int)(AudioSource.GetCurrentPosition() * circularAudioClip.SegCount);
 
             // Check every frame to see if the AudioSource has 
             // just moved to a new segment in the AudioBuffer 
@@ -128,7 +128,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             // It's been passed already without playing.
             if (segments.ContainsKey(index)) return;
 
-            int locIdx = (int)(AudioSource.Position() * circularAudioClip.SegCount);
+            int locIdx = (int)(AudioSource.GetCurrentPosition() * circularAudioClip.SegCount);
             locIdx = Mathf.Clamp(locIdx, 0, circularAudioClip.SegCount - 1);
 
             var bufferIndex = circularAudioClip.GetNormalizedIndex(index);
