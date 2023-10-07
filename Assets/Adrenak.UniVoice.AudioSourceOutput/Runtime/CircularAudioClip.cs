@@ -2,15 +2,15 @@
 
 namespace Adrenak.UniVoice.AudioSourceOutput {
     /// <summary>
-    /// Used to arrange irregular, out of order 
-    /// and skipped audio segments for better playback.
+    /// Used to arrange irregular, out of order and skipped audio segments for better playback.
     /// </summary>
     public class CircularAudioClip {
         public AudioClip AudioClip { get; private set; }
         public int SegCount { get; private set; }
         public int SegDataLen { get; private set; }
 
-        // Holds the first valid segment index received by the buffer
+        // Holds the first valid segment index received by the buffer to make sure that future
+        // writes are not of older indices
         int firstIndex;
 
         /// <summary>

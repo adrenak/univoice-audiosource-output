@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using UnityEditor.Networking.PlayerConnection;
+
 using UnityEngine;
 
 namespace Adrenak.UniVoice.AudioSourceOutput {
@@ -10,6 +12,8 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
     /// of the buffer based on the AudioSource's position.
     /// </summary>
     public class UniVoiceAudioSourceOutput : MonoBehaviour, IAudioOutput {
+        const string TAG = "UniVoiceAudioSourceOutput";
+
         enum Status {
             Ahead,
             Current,
@@ -73,6 +77,14 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             ctd.circularAudioClip = buffer;
             ctd.AudioSource = source;
 
+            Debug.unityLogger.Log(TAG, $"Created with the following params:" +
+            $"buffer SegCount: {buffer.SegCount}" +
+            $"buffer SegDataLen: {buffer.SegDataLen}" +
+            $"buffer MinSegCount: {ctd.MinSegCount}" +
+            $"buffer AudioClip channels: {buffer.AudioClip.channels}" +
+            $"buffer AudioClip frequency: {buffer.AudioClip.frequency}" +
+            $"buffer AudioClip samples: {buffer.AudioClip.samples}");
+
             return ctd;
         }
 
@@ -84,7 +96,7 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         private void Update() {
             if (AudioSource.clip == null) return;
 
-            var index = (int)(AudioSource.Position() * circularAudioClip.SegCount);
+            var index = (int)(AudioSource.GetCurrentNormPosition() * circularAudioClip.SegCount);
 
             // Check every frame to see if the AudioSource has 
             // just moved to a new segment in the AudioBuffer 
@@ -122,13 +134,12 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
         /// </param>
         /// 
         /// <param name="audioSamples">The audio samples being fed</param>
-        public void Feed
-        (int index, int frequency, int channelCount, float[] audioSamples) {
+        public void Feed(int index, int frequency, int channelCount, float[] audioSamples) {
             // If we already have this index, don't bother
             // It's been passed already without playing.
             if (segments.ContainsKey(index)) return;
 
-            int locIdx = (int)(AudioSource.Position() * circularAudioClip.SegCount);
+            int locIdx = (int)(AudioSource.GetCurrentNormPosition() * circularAudioClip.SegCount);
             locIdx = Mathf.Clamp(locIdx, 0, circularAudioClip.SegCount - 1);
 
             var bufferIndex = circularAudioClip.GetNormalizedIndex(index);
@@ -140,6 +151,13 @@ namespace Adrenak.UniVoice.AudioSourceOutput {
             segments.Add(index, Status.Ahead);
             circularAudioClip.Write(index, audioSamples);
         }
+
+        /// <summary>
+        /// Feeds an incoming <see cref="ChatroomAudioSegment"/> into the audio buffer.
+        /// </summary>
+        /// <param name="segment"></param>
+        public void Feed(ChatroomAudioSegment segment) =>
+            Feed(segment.segmentIndex, segment.frequency, segment.channelCount, segment.samples);
 
         /// <summary>
         /// Disposes the instance by deleting the GameObject of the component.

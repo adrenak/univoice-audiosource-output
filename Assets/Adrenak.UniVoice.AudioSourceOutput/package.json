@@ -1,6 +1,6 @@
 {
 	"name": "com.adrenak.univoice.audiosourceoutput",
-	"version": "1.0.1",
+	"version": "3.0.0",
 	"displayName": "Adrenak.UniVoice.AudioSourceOutput",
 	"description": "AudioSource based UniVoice Audio Output implementation",
 	"unity": "2019.4",
@@ -19,7 +19,7 @@
 		"registry": "https://registry.npmjs.org"
 	},
 	"dependencies": {
-		"com.adrenak.univoice": "2.0.0"
+		"com.adrenak.univoice": "3.0.0"
 	},
 	"scopedRegistries": [
 		{
